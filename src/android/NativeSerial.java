@@ -3,6 +3,7 @@ package me.izee.cordova.plugin;
 import android.util.Base64;
 import android.util.Log;
 import android_serialport_api.SerialPort;
+import android_serialport_api.SerialPortFinder;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -26,11 +27,20 @@ public class NativeSerial extends CordovaPlugin {
   private SerialPort port;
   private List<CallbackContext> watchers = new LinkedList<CallbackContext>();
   private Future futureWatch;
+  public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 
   @Override
   public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
 
-    if (action.equals("open")) {
+    if (action.equals("list")) {
+      JSONArray resArr = new JSONArray();
+      String[] entryValues = mSerialPortFinder.getAllDevicesPath();
+      for (int i = 0; i < entryValues.length; i++) {
+        resArr.put(i, entryValues[i]);
+      }
+      callbackContext.success(resArr);
+      return true;
+    } else if (action.equals("open")) {
       Log.d(LOG_TAG, "execute open");
       final String device = args.getString(0);
       final int rate = args.getInt(1);
