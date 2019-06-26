@@ -27,7 +27,7 @@ public class NativeSerial extends CordovaPlugin {
   private SerialPort port;
   private List<CallbackContext> watchers = new LinkedList<CallbackContext>();
   private Future futureWatch;
-  public SerialPortFinder mSerialPortFinder = new SerialPortFinder();
+  private SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 
   @Override
   public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
