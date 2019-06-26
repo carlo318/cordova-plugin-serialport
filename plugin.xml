@@ -24,6 +24,9 @@
         <source-file src="src/android/android_serialport_api/SerialPort.java"
                      target-dir="src/android_serialport_api/"/>
 
+        <source-file src="src/android/android_serialport_api/SerialPortFinder.java"
+                     target-dir="src/android_serialport_api/"/>
+
         <source-file src="src/android/NativeSerial.java"
                      target-dir="src/me/izee/cordova/plugin/"/>
 
