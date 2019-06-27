@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -27,8 +26,8 @@ import android_serialport_api.SerialPortFinder;
  */
 public class NativeSerial extends CordovaPlugin {
     private static final String LOG_TAG = "NativeSerial";
-    private Map<String, SerialPortModel> portMap = new LinkedHashMap<String, SerialPortModel>();
 
+    private Map<String, SerialPortModel> portMap = new LinkedHashMap<String, SerialPortModel>();
     private SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 
     @Override
@@ -88,7 +87,7 @@ public class NativeSerial extends CordovaPlugin {
                 public void run() {
                     SerialPortModel serialPortModel = portMap.get(device);
                     if (serialPortModel != null) {
-                        serialPortModel.getWatchers().add(callbackContext);
+                        serialPortModel.setWatcher(callbackContext);
                     }
                     NativeSerial.this.startWatch(device);
                 }
@@ -109,6 +108,7 @@ public class NativeSerial extends CordovaPlugin {
         if (futureWatch != null && !(futureWatch.isDone() || futureWatch.isCancelled())) {
             return;
         }
+
         futureWatch = cordova.getThreadPool().submit(new Runnable() {
             public void run() {
                 Log.d(LOG_TAG, "watch start run");
@@ -132,7 +132,7 @@ public class NativeSerial extends CordovaPlugin {
                         }
                     }
 
-                    List<CallbackContext> watchers = serialPortModel.getWatchers();
+                    CallbackContext watcher = serialPortModel.getWatcher();
 
                     try {
                         byte[] buffer = new byte[64];
@@ -144,8 +144,7 @@ public class NativeSerial extends CordovaPlugin {
                             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, data);
                             pluginResult.setKeepCallback(true);
 
-
-                            for (CallbackContext watcher : watchers) {
+                            if (watcher != null) {
                                 watcher.sendPluginResult(pluginResult);
                             }
                         }
@@ -153,7 +152,7 @@ public class NativeSerial extends CordovaPlugin {
                         e.printStackTrace();
                         PluginResult error = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
                         error.setKeepCallback(true);
-                        for (CallbackContext watcher : watchers) {
+                        if (watcher != null) {
                             watcher.sendPluginResult(error);
                         }
                     }
