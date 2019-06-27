@@ -30,13 +30,6 @@ public class NativeSerial extends CordovaPlugin {
     private SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 
     @Override
-    public void onReset() {
-        for (String device : portMap.keySet()) {
-            closePort(device);
-        }
-    }
-
-    @Override
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("list")) {
             JSONArray resArr = new JSONArray();
@@ -194,9 +187,6 @@ public class NativeSerial extends CordovaPlugin {
         if (serialPortModel != null) {
             serialPortModel.close();
             serialPortModel.setPort(null);
-            serialPortModel.setWatcher(null);
-            serialPortModel.setFutureWatch(null);
-            portMap.remove(device);
         }
     }
 
