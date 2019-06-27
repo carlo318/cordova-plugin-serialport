@@ -2,6 +2,8 @@ package me.izee.cordova.plugin;
 
 import org.apache.cordova.CallbackContext;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.Future;
 
 import android_serialport_api.SerialPort;
@@ -40,5 +42,21 @@ public class SerialPortModel {
 
     public void setWatcher(CallbackContext watcher) {
         this.watcher = watcher;
+    }
+
+    public void write(byte[] bytes) throws IOException {
+        if (port != null) {
+            port.getOutputStream().write(bytes);
+        }
+    }
+
+    public void close() {
+        if (port != null) {
+            port.close();
+        }
+    }
+
+    public InputStream getInputStream() {
+        return port != null ? port.getInputStream() : null;
     }
 }

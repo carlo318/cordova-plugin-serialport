@@ -12,7 +12,6 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,7 +46,6 @@ public class NativeSerial extends CordovaPlugin {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     NativeSerial.this.openPort(device, rate, callbackContext);
-//                    NativeSerial.this.startWatch(device);
                 }
             });
             return true;
@@ -109,20 +107,22 @@ public class NativeSerial extends CordovaPlugin {
             return;
         }
 
-        futureWatch = cordova.getThreadPool().submit(new Runnable() {
+        serialPortModel.setFutureWatch(cordova.getThreadPool().submit(new Runnable() {
             public void run() {
                 Log.d(LOG_TAG, "watch start run");
-                while (!Thread.currentThread().isInterrupted()) {
-                    SerialPort port = serialPortModel.getPort();
+                SerialPortModel portModel = portMap.get(device);
 
-                    if (port == null) {
+                while (!Thread.currentThread().isInterrupted()) {
+
+                    if (portModel == null) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                    InputStream inputStream = port.getInputStream();
+
+                    InputStream inputStream = portModel.getInputStream();
 
                     if (inputStream == null) {
                         try {
@@ -158,9 +158,7 @@ public class NativeSerial extends CordovaPlugin {
                     }
                 }
             }
-        });
-
-        serialPortModel.setFutureWatch(futureWatch);
+        }));
     }
 
     private void openPort(String device, int rate, CallbackContext callbackContext) {
@@ -187,14 +185,13 @@ public class NativeSerial extends CordovaPlugin {
     private void closePort(String device) {
         SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
-            SerialPort port = serialPortModel.getPort();
-            if (port != null) {
-                port.close();
-            }
+            serialPortModel.close();
+
             Future futureWatch = serialPortModel.getFutureWatch();
             if (futureWatch != null) {
                 futureWatch.cancel(true);
             }
+
             serialPortModel.setFutureWatch(null);
             serialPortModel.setPort(null);
             serialPortModel.setWatcher(null);
@@ -206,12 +203,8 @@ public class NativeSerial extends CordovaPlugin {
         try {
             SerialPortModel serialPortModel = portMap.get(device);
             if (serialPortModel != null) {
-                SerialPort port = serialPortModel.getPort();
-                if (port != null) {
-                    OutputStream outputStream = port.getOutputStream();
-                    outputStream.write(bytes);
-                    callbackContext.success();
-                }
+                serialPortModel.write(bytes);
+                callbackContext.success();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -220,18 +213,6 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private void writeText(String device, final String data, final CallbackContext callbackContext) {
-        try {
-            SerialPortModel serialPortModel = portMap.get(device);
-            if (serialPortModel != null) {
-                SerialPort port = serialPortModel.getPort();
-                if (port != null) {
-                    port.getOutputStream().write(data.getBytes());
-                    callbackContext.success();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            callbackContext.error(e.getMessage());
-        }
+        writeBytes(device, data.getBytes(), callbackContext);
     }
 }
