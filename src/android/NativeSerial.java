@@ -86,8 +86,11 @@ public class NativeSerial extends CordovaPlugin {
                     SerialPortModel serialPortModel = portMap.get(device);
                     if (serialPortModel != null) {
                         serialPortModel.setWatcher(callbackContext);
+                        Future futureWatch = serialPortModel.getFutureWatch();
+                        if (futureWatch == null) {
+                            NativeSerial.this.startWatch(device);
+                        }
                     }
-                    NativeSerial.this.startWatch(device);
                 }
             });
             return true;
@@ -98,9 +101,6 @@ public class NativeSerial extends CordovaPlugin {
 
     private synchronized void startWatch(String device) {
         SerialPortModel serialPortModel = portMap.get(device);
-        if (serialPortModel == null) {
-            return;
-        }
 
         Future futureWatch = serialPortModel.getFutureWatch();
 
@@ -193,6 +193,8 @@ public class NativeSerial extends CordovaPlugin {
             serialPortModel.close();
             serialPortModel.setPort(null);
             serialPortModel.setWatcher(null);
+            serialPortModel.setFutureWatch(null);
+            portMap.remove(device);
         }
     }
 
