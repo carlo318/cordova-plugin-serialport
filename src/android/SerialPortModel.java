@@ -3,7 +3,6 @@ package me.izee.cordova.plugin;
 import org.apache.cordova.CallbackContext;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.Future;
 
 import android_serialport_api.SerialPort;
@@ -54,9 +53,5 @@ public class SerialPortModel {
         if (port != null) {
             port.close();
         }
-    }
-
-    public InputStream getInputStream() {
-        return port != null ? port.getInputStream() : null;
     }
 }

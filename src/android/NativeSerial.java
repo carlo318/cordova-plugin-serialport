@@ -101,6 +101,7 @@ public class NativeSerial extends CordovaPlugin {
         if (serialPortModel == null) {
             return;
         }
+
         Future futureWatch = serialPortModel.getFutureWatch();
 
         if (futureWatch != null && !(futureWatch.isDone() || futureWatch.isCancelled())) {
@@ -110,11 +111,11 @@ public class NativeSerial extends CordovaPlugin {
         serialPortModel.setFutureWatch(cordova.getThreadPool().submit(new Runnable() {
             public void run() {
                 Log.d(LOG_TAG, "watch start run");
-                SerialPortModel portModel = portMap.get(device);
 
                 while (!Thread.currentThread().isInterrupted()) {
+                    SerialPort port = serialPortModel.getPort();
 
-                    if (portModel == null) {
+                    if (port == null) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -122,7 +123,7 @@ public class NativeSerial extends CordovaPlugin {
                         }
                     }
 
-                    InputStream inputStream = portModel.getInputStream();
+                    InputStream inputStream = port.getInputStream();
 
                     if (inputStream == null) {
                         try {
@@ -163,12 +164,16 @@ public class NativeSerial extends CordovaPlugin {
 
     private void openPort(String device, int rate, CallbackContext callbackContext) {
         try {
-            if (portMap.containsKey(device)) {
-                closePort(device);
+            SerialPortModel serialPortModel = portMap.get(device);
+            if (serialPortModel != null) {
+                SerialPort port = serialPortModel.getPort();
+                if (port == null) {
+                    serialPortModel.setPort(new SerialPort(new File(device), rate, 0));
+                }
+            } else {
+                serialPortModel = new SerialPortModel(new SerialPort(new File(device), rate, 0));
+                portMap.put(device, serialPortModel);
             }
-            SerialPort port = new SerialPort(new File(device), rate, 0);
-            SerialPortModel serialPortModel = new SerialPortModel(port);
-            portMap.put(device, serialPortModel);
         } catch (IOException e) {
             closePort(device);
             e.printStackTrace();
@@ -186,16 +191,8 @@ public class NativeSerial extends CordovaPlugin {
         SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
             serialPortModel.close();
-
-            Future futureWatch = serialPortModel.getFutureWatch();
-            if (futureWatch != null) {
-                futureWatch.cancel(true);
-            }
-
-            serialPortModel.setFutureWatch(null);
             serialPortModel.setPort(null);
             serialPortModel.setWatcher(null);
-            portMap.remove(device);
         }
     }
 
