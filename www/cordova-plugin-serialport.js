@@ -75,7 +75,7 @@ exports.bind = function (device, rate) {
       register(device, function (arrayBuffer) {
         success(Array.prototype.map.call(new Uint8Array(arrayBuffer), function (x) {
           return ('00' + x.toString(16)).slice(-2);
-        }).join(''))
+        }).join('').toUpperCase())
       }, error)
     }
   }
