@@ -165,20 +165,14 @@ public class NativeSerial extends CordovaPlugin {
 
     private void openPort(String device, int rate, CallbackContext callbackContext) {
         try {
-            if (!portMap.containsKey(device)) {
-                SerialPort port = new SerialPort(new File(device), rate, 0);
-                SerialPortModel serialPortModel = new SerialPortModel(port);
-                portMap.put(device, serialPortModel);
+            if (portMap.containsKey(device)) {
+                closePort(device);
             }
+            SerialPort port = new SerialPort(new File(device), rate, 0);
+            SerialPortModel serialPortModel = new SerialPortModel(port);
+            portMap.put(device, serialPortModel);
         } catch (IOException e) {
-            SerialPortModel serialPortModel = portMap.get(device);
-            if (serialPortModel != null) {
-                SerialPort port = serialPortModel.getPort();
-                if (port != null) {
-                    port.close();
-                    portMap.remove(device);
-                }
-            }
+            closePort(device);
             e.printStackTrace();
             callbackContext.error(e.getMessage());
         }
@@ -186,15 +180,26 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private void closePort(String device, final CallbackContext callbackContext) {
+        closePort(device);
+        callbackContext.success();
+    }
+
+    private void closePort(String device) {
         SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
             SerialPort port = serialPortModel.getPort();
             if (port != null) {
                 port.close();
-                portMap.remove(device);
             }
+            Future futureWatch = serialPortModel.getFutureWatch();
+            if (futureWatch != null) {
+                futureWatch.cancel(true);
+            }
+            serialPortModel.setFutureWatch(null);
+            serialPortModel.setPort(null);
+            serialPortModel.setWatcher(null);
+            portMap.remove(device);
         }
-        callbackContext.success();
     }
 
     private void writeBytes(String device, final byte[] bytes, final CallbackContext callbackContext) {
