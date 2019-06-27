@@ -133,8 +133,6 @@ public class NativeSerial extends CordovaPlugin {
                         }
                     }
 
-                    CallbackContext watcher = serialPortModel.getWatcher();
-
                     try {
                         byte[] buffer = new byte[64];
                         int size = inputStream.read(buffer);
@@ -145,6 +143,7 @@ public class NativeSerial extends CordovaPlugin {
                             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, data);
                             pluginResult.setKeepCallback(true);
 
+                            CallbackContext watcher = serialPortModel.getWatcher();
                             if (watcher != null) {
                                 watcher.sendPluginResult(pluginResult);
                             }
@@ -153,6 +152,8 @@ public class NativeSerial extends CordovaPlugin {
                         e.printStackTrace();
                         PluginResult error = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
                         error.setKeepCallback(true);
+
+                        CallbackContext watcher = serialPortModel.getWatcher();
                         if (watcher != null) {
                             watcher.sendPluginResult(error);
                         }
