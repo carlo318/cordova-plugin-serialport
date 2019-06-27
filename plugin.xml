@@ -30,6 +30,9 @@
         <source-file src="src/android/NativeSerial.java"
                      target-dir="src/me/izee/cordova/plugin/"/>
 
+        <source-file src="src/android/SerialPortModel.java"
+                     target-dir="src/me/izee/cordova/plugin/"/>
+
     </platform>
 
 </plugin>
