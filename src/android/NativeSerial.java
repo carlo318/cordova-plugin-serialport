@@ -143,20 +143,14 @@ public class NativeSerial extends CordovaPlugin {
                             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, data);
                             pluginResult.setKeepCallback(true);
 
-                            CallbackContext watcher = serialPortModel.getWatcher();
-                            if (watcher != null) {
-                                watcher.sendPluginResult(pluginResult);
-                            }
+                            serialPortModel.sendPluginResult(pluginResult);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                         PluginResult error = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
                         error.setKeepCallback(true);
 
-                        CallbackContext watcher = serialPortModel.getWatcher();
-                        if (watcher != null) {
-                            watcher.sendPluginResult(error);
-                        }
+                        serialPortModel.sendPluginResult(error);
                     }
                 }
             }

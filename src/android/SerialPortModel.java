@@ -1,6 +1,7 @@
 package me.izee.cordova.plugin;
 
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -52,6 +53,12 @@ public class SerialPortModel {
     public void close() {
         if (port != null) {
             port.close();
+        }
+    }
+
+    public void sendPluginResult(PluginResult pluginResult) {
+        if (watcher != null) {
+            watcher.sendPluginResult(pluginResult);
         }
     }
 }
