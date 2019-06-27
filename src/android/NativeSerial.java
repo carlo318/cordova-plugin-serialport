@@ -47,7 +47,7 @@ public class NativeSerial extends CordovaPlugin {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     NativeSerial.this.openPort(device, rate, callbackContext);
-                    NativeSerial.this.startWatch(device);
+//                    NativeSerial.this.startWatch(device);
                 }
             });
             return true;
@@ -113,16 +113,16 @@ public class NativeSerial extends CordovaPlugin {
             public void run() {
                 Log.d(LOG_TAG, "watch start run");
                 while (!Thread.currentThread().isInterrupted()) {
-                    SerialPort serialPortModelPort = serialPortModel.getPort();
+                    SerialPort port = serialPortModel.getPort();
 
-                    if (serialPortModelPort == null) {
+                    if (port == null) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                    InputStream inputStream = serialPortModelPort.getInputStream();
+                    InputStream inputStream = port.getInputStream();
 
                     if (inputStream == null) {
                         try {
@@ -173,9 +173,9 @@ public class NativeSerial extends CordovaPlugin {
         } catch (IOException e) {
             SerialPortModel serialPortModel = portMap.get(device);
             if (serialPortModel != null) {
-                SerialPort serialPortModelPort = serialPortModel.getPort();
-                if (serialPortModelPort != null) {
-                    serialPortModelPort.close();
+                SerialPort port = serialPortModel.getPort();
+                if (port != null) {
+                    port.close();
                     portMap.remove(device);
                 }
             }
@@ -188,9 +188,9 @@ public class NativeSerial extends CordovaPlugin {
     private void closePort(String device, final CallbackContext callbackContext) {
         SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
-            SerialPort serialPortModelPort = serialPortModel.getPort();
-            if (serialPortModelPort != null) {
-                serialPortModelPort.close();
+            SerialPort port = serialPortModel.getPort();
+            if (port != null) {
+                port.close();
                 portMap.remove(device);
             }
         }
@@ -201,9 +201,9 @@ public class NativeSerial extends CordovaPlugin {
         try {
             SerialPortModel serialPortModel = portMap.get(device);
             if (serialPortModel != null) {
-                SerialPort serialPortModelPort = serialPortModel.getPort();
-                if (serialPortModelPort != null) {
-                    OutputStream outputStream = serialPortModelPort.getOutputStream();
+                SerialPort port = serialPortModel.getPort();
+                if (port != null) {
+                    OutputStream outputStream = port.getOutputStream();
                     outputStream.write(bytes);
                     callbackContext.success();
                 }
@@ -218,9 +218,9 @@ public class NativeSerial extends CordovaPlugin {
         try {
             SerialPortModel serialPortModel = portMap.get(device);
             if (serialPortModel != null) {
-                SerialPort serialPortModelPort = serialPortModel.getPort();
-                if (serialPortModelPort != null) {
-                    serialPortModelPort.getOutputStream().write(data.getBytes());
+                SerialPort port = serialPortModel.getPort();
+                if (port != null) {
+                    port.getOutputStream().write(data.getBytes());
                     callbackContext.success();
                 }
             }
