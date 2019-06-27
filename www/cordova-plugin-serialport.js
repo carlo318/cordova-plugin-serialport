@@ -31,7 +31,6 @@ exports.register = register;
 
 exports.bind = function (device) {
 
-
   this.open = function (rate, success, error) {
     open(device, rate, success, error);
   };
@@ -47,7 +46,6 @@ exports.bind = function (device) {
   this.close = function (success, error) {
     close(device, success, error);
   };
-
 
   this.register = function (success, error) {
     register(device, success, error);
