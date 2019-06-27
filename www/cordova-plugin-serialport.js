@@ -34,9 +34,9 @@ function register(device, success, error) {
 
 exports.register = register;
 
-exports.bind = function (device) {
+exports.bind = function (device, rate) {
 
-  this.open = function (rate, success, error) {
+  this.open = function (success, error) {
     open(device, rate, success, error);
   };
 
