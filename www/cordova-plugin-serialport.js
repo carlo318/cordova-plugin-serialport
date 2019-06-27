@@ -48,11 +48,35 @@ exports.bind = function (device, rate) {
     writeText(device, text, success, error);
   };
 
+  this.writeHex = function (hex, success, error) {
+    write(device, new Uint8Array(
+      hex.match(/[\da-f]{2}/gi).map(function (h) {
+        return parseInt(h, 16);
+      })
+    ).buffer, success, error);
+  };
+
   this.close = function (success, error) {
     close(device, success, error);
   };
 
-  this.register = function (success, error) {
-    register(device, success, error);
+  this.register = function (success, error, type) {
+    if (type == null) {
+      register(device, success, error);
+    } else if (type === 'ascii') {
+      register(device, function (arrayBuffer) {
+        success(Array.prototype.map
+          .call(new Uint8Array(arrayBuffer), function (bit) {
+            return String.fromCharCode(bit);
+          })
+          .join(""));
+      }, error)
+    } else if (type === 'hex') {
+      register(device, function (arrayBuffer) {
+        success(Array.prototype.map.call(new Uint8Array(arrayBuffer), function (x) {
+          return ('00' + x.toString(16)).slice(-2);
+        }).join(''))
+      }, error)
+    }
   }
 };
