@@ -67,7 +67,9 @@ exports.bind = function (device, rate) {
           .call(new Uint8Array(arrayBuffer), function (bit) {
             return String.fromCharCode(bit);
           })
-          .join(""));
+          .join("")
+          .replace(/\r/g, "")
+          .replace(/\n/g, ""));
       }, error)
     } else if (type === 'hex') {
       register(device, function (arrayBuffer) {
