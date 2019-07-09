@@ -47,7 +47,9 @@ public class SerialPort {
                 su = Runtime.getRuntime().exec("su");
                 String cmd = "chmod 666 " + device.getAbsolutePath() + "\n"
                         + "exit\n";
-                su.getOutputStream().write(cmd.getBytes());
+                OutputStream os = su.getOutputStream();
+                os.write(cmd.getBytes());
+                os.flush();
                 if ((su.waitFor() != 0) || !device.canRead()
                         || !device.canWrite()) {
                     throw new SecurityException();
