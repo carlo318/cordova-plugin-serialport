@@ -61,9 +61,7 @@ exports.bind = function (device, rate) {
   };
 
   this.register = function (success, error, type) {
-    if (type == null) {
-      register(device, success, error);
-    } else if (type === 'ascii') {
+    if (type === 'ascii') {
       register(device, function (arrayBuffer) {
         success(Array.prototype.map
           .call(new Uint8Array(arrayBuffer), function (bit) {
@@ -77,6 +75,8 @@ exports.bind = function (device, rate) {
           return ('00' + x.toString(16)).slice(-2);
         }).join('').toUpperCase())
       }, error)
+    } else {
+      register(device, success, error);
     }
   }
 };
