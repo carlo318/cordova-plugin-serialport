@@ -88,7 +88,7 @@ public class NativeSerial extends CordovaPlugin {
         return false;
     }
 
-    private void openPort(String device, int rate, CallbackContext callbackContext) {
+    private void openPort(String device, int rate, final CallbackContext callbackContext) {
         if (!portMap.containsKey(device)) {
             portMap.put(device, new SerialPortModel(device, rate));
         }
