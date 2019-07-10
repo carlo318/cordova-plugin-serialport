@@ -44,6 +44,9 @@
         <source-file src="src/android/tp/xmaihh/serialport/stick/BaseStickPackageHelper.java"
                      target-dir="src/tp/xmaihh/serialport/stick"/>
 
+        <source-file src="src/android/tp/xmaihh/serialport/stick/ParserDelimiterStickPackageHelper.java"
+                     target-dir="src/tp/xmaihh/serialport/stick"/>
+
         <source-file src="src/android/tp/xmaihh/serialport/stick/RS485StickPackageHelper.java"
                      target-dir="src/tp/xmaihh/serialport/stick"/>
 

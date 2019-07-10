@@ -7,12 +7,15 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android_serialport_api.SerialPortFinder;
+import tp.xmaihh.serialport.stick.ParserDelimiterStickPackageHelper;
+import tp.xmaihh.serialport.stick.RS485StickPackageHelper;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -44,9 +47,10 @@ public class NativeSerial extends CordovaPlugin {
             Log.d(LOG_TAG, "execute open");
             final String device = args.getString(0);
             final int rate = args.getInt(1);
+            final JSONObject options = args.getJSONObject(2);
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    NativeSerial.this.openPort(device, rate, callbackContext);
+                    NativeSerial.this.openPort(device, rate, options, callbackContext);
                 }
             });
             return true;
@@ -96,7 +100,7 @@ public class NativeSerial extends CordovaPlugin {
         return false;
     }
 
-    private void openPort(String device, int rate, final CallbackContext callbackContext) {
+    private void openPort(String device, int rate, JSONObject options, final CallbackContext callbackContext) {
         if (Arrays.binarySearch(allDevicesPath, device) < 0) {
             callbackContext.error("not serial port");
             return;
@@ -105,6 +109,17 @@ public class NativeSerial extends CordovaPlugin {
         try {
             if (!portMap.containsKey(device)) {
                 SerialPortModel serialPortModel = new SerialPortModel(device, rate);
+                if (options != null) {
+                    String pipe = options.getString("pipe");
+                    if ("RS485".equals(pipe)) {
+                        serialPortModel.setStickPackageHelper(new RS485StickPackageHelper());
+                    } else if ("ParserDelimiter".equals(pipe)) {
+                        String delimiter = options.getString("delimiter");
+                        if (delimiter != null) {
+                            serialPortModel.setStickPackageHelper(new ParserDelimiterStickPackageHelper(delimiter));
+                        }
+                    }
+                }
                 serialPortModel.open();
                 portMap.put(device, serialPortModel);
             }
