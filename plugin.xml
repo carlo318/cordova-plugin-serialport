@@ -14,12 +14,14 @@
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
 
-        <source-file src="libs/android/armeabi/libserial_port.so"
+        <source-file src="libs/android/armeabi/libserialport.so"
                      target-dir="libs/armeabi/"/>
-        <source-file src="libs/android/armeabi-v7a/libserial_port.so"
+        <source-file src="libs/android/armeabi-v7a/libserialport.so"
                      target-dir="libs/armeabi-v7a/"/>
-        <source-file src="libs/android/x86/libserial_port.so"
+        <source-file src="libs/android/x86/libserialport.so"
                      target-dir="libs/x86/"/>
+        <source-file src="libs/android/x86_64/libserialport.so"
+                     target-dir="libs/x86_64/"/>
 
         <source-file src="src/android/android_serialport_api/SerialPort.java"
                      target-dir="src/android_serialport_api/"/>
@@ -33,6 +35,29 @@
         <source-file src="src/android/SerialPortModel.java"
                      target-dir="src/me/izee/cordova/plugin/"/>
 
+        <source-file src="src/android/tp/xmaihh/serialport/bean/ComBean.java"
+                     target-dir="src/tp/xmaihh/serialport/bean"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/stick/AbsStickPackageHelper.java"
+                     target-dir="src/tp/xmaihh/serialport/stick"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/stick/BaseStickPackageHelper.java"
+                     target-dir="src/tp/xmaihh/serialport/stick"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/stick/SpecifiedStickPackageHelper.java"
+                     target-dir="src/tp/xmaihh/serialport/stick"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/stick/StaticLenStickPackageHelper.java"
+                     target-dir="src/tp/xmaihh/serialport/stick"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/stick/VariableLenStickPackageHelper.java"
+                     target-dir="src/tp/xmaihh/serialport/stick"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/utils/ByteUtil.java"
+                     target-dir="src/tp/xmaihh/serialport/utils"/>
+
+        <source-file src="src/android/tp/xmaihh/serialport/SerialHelper.java"
+                     target-dir="src/tp/xmaihh/serialport"/>
     </platform>
 
 </plugin>
