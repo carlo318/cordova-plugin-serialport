@@ -5,19 +5,12 @@ import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
+import java.util.concurrent.ConcurrentHashMap;
 
-import android_serialport_api.SerialPort;
 import android_serialport_api.SerialPortFinder;
 
 /**
@@ -26,7 +19,7 @@ import android_serialport_api.SerialPortFinder;
 public class NativeSerial extends CordovaPlugin {
     private static final String LOG_TAG = "NativeSerial";
 
-    private Map<String, me.izee.cordova.plugin.SerialPortModel> portMap = new LinkedHashMap<String, me.izee.cordova.plugin.SerialPortModel>();
+    private Map<String, SerialPortModel> portMap = new ConcurrentHashMap<>();
     private SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 
     @Override
@@ -83,13 +76,9 @@ public class NativeSerial extends CordovaPlugin {
 
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
+                    SerialPortModel serialPortModel = portMap.get(device);
                     if (serialPortModel != null) {
                         serialPortModel.setWatcher(callbackContext);
-                        Future futureWatch = serialPortModel.getFutureWatch();
-                        if (futureWatch == null) {
-                            NativeSerial.this.startWatch(device);
-                        }
                     }
                 }
             });
@@ -99,80 +88,9 @@ public class NativeSerial extends CordovaPlugin {
         return false;
     }
 
-    private synchronized void startWatch(String device) {
-        me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
-
-        Future futureWatch = serialPortModel.getFutureWatch();
-
-        if (futureWatch != null && !(futureWatch.isDone() || futureWatch.isCancelled())) {
-            return;
-        }
-
-        serialPortModel.setFutureWatch(cordova.getThreadPool().submit(new Runnable() {
-            public void run() {
-                Log.d(LOG_TAG, "watch start run");
-
-                while (!Thread.currentThread().isInterrupted()) {
-                    SerialPort port = serialPortModel.getPort();
-
-                    if (port == null) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    InputStream inputStream = port.getInputStream();
-
-                    if (inputStream == null) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    try {
-                        byte[] buffer = new byte[74];
-                        int size = inputStream.read(buffer);
-                        if (size > 0) {
-                            Log.d(LOG_TAG, String.format("%s,got input:%s", System.currentTimeMillis(), size));
-//              PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, new String(buffer, 0, size));
-                            byte[] data = Arrays.copyOf(buffer, size);
-                            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, data);
-                            pluginResult.setKeepCallback(true);
-
-                            serialPortModel.sendPluginResult(pluginResult);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        PluginResult error = new PluginResult(PluginResult.Status.ERROR, e.getMessage());
-                        error.setKeepCallback(true);
-
-                        serialPortModel.sendPluginResult(error);
-                    }
-                }
-            }
-        }));
-    }
-
     private void openPort(String device, int rate, CallbackContext callbackContext) {
-        try {
-            me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
-            if (serialPortModel != null) {
-                SerialPort port = serialPortModel.getPort();
-                if (port == null) {
-                    serialPortModel.setPort(new SerialPort(new File(device), rate, 0));
-                }
-            } else {
-                serialPortModel = new me.izee.cordova.plugin.SerialPortModel(new SerialPort(new File(device), rate, 0));
-                portMap.put(device, serialPortModel);
-            }
-        } catch (IOException e) {
-            closePort(device);
-            e.printStackTrace();
-            callbackContext.error(e.getMessage());
+        if (!portMap.containsKey(device)) {
+            portMap.put(device, new SerialPortModel(device, rate));
         }
         callbackContext.success();
     }
@@ -183,23 +101,17 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private void closePort(String device) {
-        me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
+        SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
             serialPortModel.close();
-            serialPortModel.setPort(null);
         }
     }
 
     private void writeBytes(String device, final byte[] bytes, final CallbackContext callbackContext) {
-        try {
-            me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
-            if (serialPortModel != null) {
-                serialPortModel.write(bytes);
-                callbackContext.success();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            callbackContext.error(e.getMessage());
+        SerialPortModel serialPortModel = portMap.get(device);
+        if (serialPortModel != null) {
+            serialPortModel.send(bytes);
+            callbackContext.success();
         }
     }
 
