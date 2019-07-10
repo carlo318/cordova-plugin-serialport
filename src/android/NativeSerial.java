@@ -26,7 +26,7 @@ import android_serialport_api.SerialPortFinder;
 public class NativeSerial extends CordovaPlugin {
     private static final String LOG_TAG = "NativeSerial";
 
-    private Map<String, SerialPortModel> portMap = new LinkedHashMap<String, SerialPortModel>();
+    private Map<String, me.izee.cordova.plugin.SerialPortModel> portMap = new LinkedHashMap<String, me.izee.cordova.plugin.SerialPortModel>();
     private SerialPortFinder mSerialPortFinder = new SerialPortFinder();
 
     @Override
@@ -83,7 +83,7 @@ public class NativeSerial extends CordovaPlugin {
 
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    SerialPortModel serialPortModel = portMap.get(device);
+                    me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
                     if (serialPortModel != null) {
                         serialPortModel.setWatcher(callbackContext);
                         Future futureWatch = serialPortModel.getFutureWatch();
@@ -100,7 +100,7 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private synchronized void startWatch(String device) {
-        SerialPortModel serialPortModel = portMap.get(device);
+        me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
 
         Future futureWatch = serialPortModel.getFutureWatch();
 
@@ -134,7 +134,7 @@ public class NativeSerial extends CordovaPlugin {
                     }
 
                     try {
-                        byte[] buffer = new byte[64];
+                        byte[] buffer = new byte[74];
                         int size = inputStream.read(buffer);
                         if (size > 0) {
                             Log.d(LOG_TAG, String.format("%s,got input:%s", System.currentTimeMillis(), size));
@@ -159,14 +159,14 @@ public class NativeSerial extends CordovaPlugin {
 
     private void openPort(String device, int rate, CallbackContext callbackContext) {
         try {
-            SerialPortModel serialPortModel = portMap.get(device);
+            me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
             if (serialPortModel != null) {
                 SerialPort port = serialPortModel.getPort();
                 if (port == null) {
                     serialPortModel.setPort(new SerialPort(new File(device), rate, 0));
                 }
             } else {
-                serialPortModel = new SerialPortModel(new SerialPort(new File(device), rate, 0));
+                serialPortModel = new me.izee.cordova.plugin.SerialPortModel(new SerialPort(new File(device), rate, 0));
                 portMap.put(device, serialPortModel);
             }
         } catch (IOException e) {
@@ -183,7 +183,7 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private void closePort(String device) {
-        SerialPortModel serialPortModel = portMap.get(device);
+        me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
             serialPortModel.close();
             serialPortModel.setPort(null);
@@ -192,7 +192,7 @@ public class NativeSerial extends CordovaPlugin {
 
     private void writeBytes(String device, final byte[] bytes, final CallbackContext callbackContext) {
         try {
-            SerialPortModel serialPortModel = portMap.get(device);
+            me.izee.cordova.plugin.SerialPortModel serialPortModel = portMap.get(device);
             if (serialPortModel != null) {
                 serialPortModel.write(bytes);
                 callbackContext.success();
