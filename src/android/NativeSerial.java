@@ -7,7 +7,6 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -55,10 +54,9 @@ public class NativeSerial extends CordovaPlugin {
             Log.d(LOG_TAG, "execute open");
             final String device = args.getString(0);
             final int rate = args.getInt(1);
-            final JSONObject options = args.getJSONObject(2);
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    NativeSerial.this.openPort(device, rate, options, callbackContext);
+                    NativeSerial.this.openPort(device, rate, callbackContext);
                 }
             });
             return true;
@@ -108,7 +106,7 @@ public class NativeSerial extends CordovaPlugin {
         return false;
     }
 
-    private void openPort(String device, int rate, JSONObject options, final CallbackContext callbackContext) {
+    private void openPort(String device, int rate, final CallbackContext callbackContext) {
         if (Arrays.binarySearch(allDevicesPath, device) < 0) {
             callbackContext.error("not serial port");
             return;

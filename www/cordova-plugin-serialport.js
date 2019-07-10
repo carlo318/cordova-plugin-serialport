@@ -4,8 +4,8 @@ exports.list = function (success, error) {
   exec(success, error, "cordova-plugin-serialport", "list", []);
 };
 
-function open(device, rate, options, success, error) {
-  exec(success, error, "cordova-plugin-serialport", "open", [device, rate, options]);
+function open(device, rate, success, error) {
+  exec(success, error, "cordova-plugin-serialport", "open", [device, rate]);
 }
 
 exports.open = open;
@@ -34,10 +34,10 @@ function register(device, success, error) {
 
 exports.register = register;
 
-exports.bind = function (device, rate, options) {
+exports.bind = function (device, rate) {
 
   this.open = function (success, error) {
-    open(device, rate, options, success, error);
+    open(device, rate, success, error);
   };
 
   this.write = function (arrayBuffer, success, error) {
