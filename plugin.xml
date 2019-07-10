@@ -14,8 +14,8 @@
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
 
-        <source-file src="libs/android/armeabi/libserialport.so"
-                     target-dir="libs/armeabi/"/>
+        <source-file src="libs/android/arm64-v8a/libserialport.so"
+                     target-dir="libs/arm64-v8a/"/>
         <source-file src="libs/android/armeabi-v7a/libserialport.so"
                      target-dir="libs/armeabi-v7a/"/>
         <source-file src="libs/android/x86/libserialport.so"
