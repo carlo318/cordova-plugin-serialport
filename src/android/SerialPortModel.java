@@ -16,9 +16,11 @@ public class SerialPortModel extends SerialHelper {
 
     @Override
     protected void onDataReceived(ComBean paramComBean) {
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, paramComBean.bRec);
-        pluginResult.setKeepCallback(true);
-        watcher.sendPluginResult(pluginResult);
+        if (watcher != null) {
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, paramComBean.bRec);
+            pluginResult.setKeepCallback(true);
+            watcher.sendPluginResult(pluginResult);
+        }
     }
 
 
