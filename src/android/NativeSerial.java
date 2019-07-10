@@ -8,6 +8,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,10 +90,17 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private void openPort(String device, int rate, final CallbackContext callbackContext) {
-        if (!portMap.containsKey(device)) {
-            portMap.put(device, new SerialPortModel(device, rate));
+        try {
+            if (!portMap.containsKey(device)) {
+                SerialPortModel serialPortModel = new SerialPortModel(device, rate);
+                serialPortModel.open();
+                portMap.put(device, serialPortModel);
+            }
+            callbackContext.success();
+        } catch (IOException e) {
+//            e.printStackTrace();
+            callbackContext.error(e.getMessage());
         }
-        callbackContext.success();
     }
 
     private void closePort(String device, final CallbackContext callbackContext) {
