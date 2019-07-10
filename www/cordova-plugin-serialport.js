@@ -69,7 +69,8 @@ exports.bind = function (device, rate) {
           })
           .join("")
           .replace(/\r/g, "")
-          .replace(/\n/g, ""));
+          .replace(/\n/g, "")
+          .trim());
       }, error)
     } else if (type === 'hex') {
       register(device, function (arrayBuffer) {
