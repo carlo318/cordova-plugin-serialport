@@ -119,17 +119,6 @@ public class NativeSerial extends CordovaPlugin {
         try {
             if (!portMap.containsKey(device)) {
                 SerialPortModel serialPortModel = new SerialPortModel(device, rate);
-                if (options != null) {
-                    String pipe = options.getString("pipe");
-                    if ("RS485".equals(pipe)) {
-                        serialPortModel.setStickPackageHelper(new RS485StickPackageHelper());
-                    } else if ("ParserDelimiter".equals(pipe)) {
-                        String delimiter = options.getString("delimiter");
-                        if (delimiter != null) {
-                            serialPortModel.setStickPackageHelper(new ParserDelimiterStickPackageHelper(delimiter));
-                        }
-                    }
-                }
                 serialPortModel.open();
                 portMap.put(device, serialPortModel);
             }
