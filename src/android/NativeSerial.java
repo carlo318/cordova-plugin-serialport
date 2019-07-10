@@ -8,7 +8,6 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -97,9 +96,12 @@ public class NativeSerial extends CordovaPlugin {
                 portMap.put(device, serialPortModel);
             }
             callbackContext.success();
-        } catch (IOException e) {
-//            e.printStackTrace();
-            callbackContext.error(e.getMessage());
+            Log.d(LOG_TAG, "open " + device + " success");
+        } catch (Exception e) {
+            String message = e.getMessage();
+            callbackContext.error(message);
+            Log.d(LOG_TAG, "open " + device + " error");
+            Log.e(LOG_TAG, message);
         }
     }
 
@@ -112,6 +114,7 @@ public class NativeSerial extends CordovaPlugin {
         SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
             serialPortModel.close();
+            Log.d(LOG_TAG, "close " + device + " success");
         }
     }
 
