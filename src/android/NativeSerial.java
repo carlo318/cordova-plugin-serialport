@@ -15,8 +15,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android_serialport_api.SerialPortFinder;
-import tp.xmaihh.serialport.stick.ParserDelimiterStickPackageHelper;
-import tp.xmaihh.serialport.stick.RS485StickPackageHelper;
 
 /**
  * This class echoes a string called from JavaScript.
