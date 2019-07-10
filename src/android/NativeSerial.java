@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android_serialport_api.SerialPortFinder;
@@ -35,6 +36,15 @@ public class NativeSerial extends CordovaPlugin {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void onReset() {
+        super.onReset();
+        Set<String> keySet = portMap.keySet();
+        for (String device : keySet) {
+            closePort(device);
         }
     }
 
@@ -142,6 +152,7 @@ public class NativeSerial extends CordovaPlugin {
         SerialPortModel serialPortModel = portMap.get(device);
         if (serialPortModel != null) {
             serialPortModel.close();
+            portMap.remove(device);
             Log.d(LOG_TAG, "close " + device + " success");
         }
     }
