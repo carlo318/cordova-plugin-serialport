@@ -8,6 +8,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,15 +22,22 @@ public class NativeSerial extends CordovaPlugin {
 
     private Map<String, SerialPortModel> portMap = new ConcurrentHashMap<>();
     private SerialPortFinder mSerialPortFinder = new SerialPortFinder();
+    private String[] allDevicesPath = mSerialPortFinder.getAllDevicesPath();
+    private JSONArray resArr = new JSONArray();
+
+    {
+        for (int i = 0; i < allDevicesPath.length; i++) {
+            try {
+                resArr.put(i, allDevicesPath[i]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("list")) {
-            JSONArray resArr = new JSONArray();
-            String[] entryValues = mSerialPortFinder.getAllDevicesPath();
-            for (int i = 0; i < entryValues.length; i++) {
-                resArr.put(i, entryValues[i]);
-            }
             callbackContext.success(resArr);
             return true;
         } else if (action.equals("open")) {
@@ -89,6 +97,11 @@ public class NativeSerial extends CordovaPlugin {
     }
 
     private void openPort(String device, int rate, final CallbackContext callbackContext) {
+        if (Arrays.binarySearch(allDevicesPath, device) < 0) {
+            callbackContext.error("not serial port");
+            return;
+        }
+
         try {
             if (!portMap.containsKey(device)) {
                 SerialPortModel serialPortModel = new SerialPortModel(device, rate);
